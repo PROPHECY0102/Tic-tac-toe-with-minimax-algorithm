@@ -21,8 +21,8 @@
         <ul class="nav-list">
           <li><button class="new-game">New Game</button></li>
           <li><button class="scoreboard">Scoreboard</button></li>
+          <li><button class="vs-player">Vs Player</button></li>
           <li><button class="vs-bots">Vs Bots</button></li>
-          <li><button class="v-player">Vs Player</button></li>
         </ul>
       </nav>
       <h1 class="title-logo">Tic <span class="tac">Tac</span> Toe</h1>
@@ -50,8 +50,54 @@
     </header>
     <main>
       <div class="container">
-        <div class="game"></div>
-        <div class="menu"></div>
+        <div class="game">
+          <div class="game-board-container">
+            <div class="game-board">
+              <div class="area area-1">
+                <div class="occupied" data-player="x"></div>
+              </div>
+              <div class="area area-2">
+                <div class="occupied" data-player="o"></div>
+              </div>
+              <div class="area area-3">
+                <div class="occupied" data-player="x"></div>
+              </div>
+              <div class="area area-4">
+                <div class="occupied" data-player="o"></div>
+              </div>
+              <div class="area area-5">
+                <div class="occupied" data-player="x"></div>
+              </div>
+              <div class="area area-6">
+                <div class="occupied" data-player="o"></div>
+              </div>
+              <div class="area area-7">
+                <div class="occupied" data-player="x"></div>
+              </div>
+              <div class="area area-8">
+                <div class="occupied" data-player="o"></div>
+              </div>
+              <div class="area area-9">
+                <div class="occupied" data-player="x"></div>
+              </div>
+            </div>
+          </div>
+          <div class="menu-container">
+            <div class="menu">
+              <div class="heading-text">
+                <h2 class="title">Tic Tac Toe v0.1</h2>
+                <p class="author">By PROPHECY | Entropy/エントロピ CORP</p>
+                <p class="current-message">Start a New Game of Tic Tac Toe?</p>
+              </div>
+              <div class="info-container">
+                <div class="new-game-options">
+                  <button class="button-primary | vs-player">Vs Player</button>
+                  <button class="button-primary | vs-bots">Vs Bots</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </body>
