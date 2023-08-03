@@ -539,7 +539,11 @@ main {
 .coinflip-animation {
   width: var(--size-900);
   aspect-ratio: 1/1;
-  animation: fade-in-out 300ms ease-in-out infinite;
+  animation: fade-in-out 300ms linear infinite;
+}
+
+.coinflip-animation[data-no-animation] {
+  animation: none;
 }
 
 @keyframes fade-in-out {

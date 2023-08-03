@@ -1,3 +1,5 @@
+"strict mode";
+
 import githubIcon from "./assets/images/github.png";
 import twitterIcon from "./assets/images/twitter.png";
 import xIcon from "./assets/images/x.png";
@@ -9,17 +11,7 @@ const twitterLink = document.querySelector(".twitter-icon");
 githubLink.setAttribute("src", githubIcon);
 twitterLink.setAttribute("src", twitterIcon);
 
-const occupiedAreas = document.querySelectorAll(".occupied");
-
-occupiedAreas.forEach((area) => {
-  const playerData = area.getAttribute("data-player");
-  const icon = playerData === "x" ? xIcon : oIcon;
-  const activeIcon = document.createElement("img");
-  activeIcon.classList.add("active-icon");
-  activeIcon.setAttribute("src", icon);
-  area.append(activeIcon);
-});
-
+// Closing modal overlay functionality
 const closeIcons = document.querySelectorAll(".close");
 const overlay = document.querySelector(".overlay");
 const modal = document.querySelector(".modal");
@@ -27,24 +19,159 @@ const modalContents = document.querySelectorAll(".modal-content");
 
 closeIcons.forEach((close) => {
   close.addEventListener("click", () => {
-    console.log("test");
-    overlay.toggleAttribute("data-visible");
-    modal.toggleAttribute("data-visible");
-    modalContents.forEach((content) => {
-      if (content.hasAttribute("data-visible")) {
-        content.toggleAttribute("data-visible");
-      }
-    });
+    closeOverlay();
   });
 });
 
+function closeOverlay() {
+  overlay.toggleAttribute("data-visible");
+  modal.toggleAttribute("data-visible");
+  modalContents.forEach((content) => {
+    if (content.hasAttribute("data-visible")) {
+      content.toggleAttribute("data-visible");
+    }
+  });
+}
+
+// Game Object
+
+const areasObject = {
+  area1: null,
+  area2: null,
+  area3: null,
+  area4: null,
+  area5: null,
+  area6: null,
+  area7: null,
+  area8: null,
+  area9: null,
+};
+
+const patterns = {
+  pattern1: ["area1", "area2", "area3"],
+  pattern2: ["area1", "area4", "area7"],
+  pattern3: ["area1", "area5", "area9"],
+  pattern4: ["area2", "area5", "area8"],
+  pattern5: ["area3", "area6", "area9"],
+  pattern6: ["area4", "area5", "area6"],
+  pattern7: ["area7", "area8", "area9"],
+  pattern8: ["area7", "area5", "area3"],
+};
+
+const game = {
+  currentActive: "x",
+  xPlayerScore: 0,
+  oPlayerScore: 0,
+  areasObject,
+  patterns,
+  state: "playing",
+
+  newCurrentActive() {
+    const rand = Math.random();
+    game.currentActive = rand >= 0.5 ? "x" : "o";
+  },
+
+  swapPlayer() {
+    game.currentActive = game.currentActive === "x" ? "o" : "x";
+  },
+
+  getIcon() {
+    return game.currentActive === "x" ? xIcon : oIcon;
+  },
+
+  checkWinner() {
+    let match1;
+    let match2;
+    let match3;
+    for (const key in game.patterns) {
+      match1 = game.areasObject[game.patterns[key][0]];
+      match2 = game.areasObject[game.patterns[key][1]];
+      match3 = game.areasObject[game.patterns[key][2]];
+      if (match1 === "x" && match2 === "x" && match3 === "x") {
+        const lineID = `${game.patterns[key][0].slice(-1)}${game.patterns[
+          key
+        ][1].slice(-1)}${game.patterns[key][2].slice(-1)}`;
+        return [true, lineID, "x"];
+      }
+      if (match1 === "o" && match2 === "o" && match3 === "o") {
+        const lineID = `${game.patterns[key][0].slice(-1)}${game.patterns[
+          key
+        ][1].slice(-1)}${game.patterns[key][2].slice(-1)}`;
+        return [true, lineID, "o"];
+      }
+    }
+    return [false, null, null];
+  },
+
+  resetArea() {
+    for (const key in game.areasObject) {
+      game.areasObject[key] = null;
+    }
+  },
+};
+
+// Pre-Render Landing Page
+const areas = document.querySelectorAll(".area");
+
+function initialiseArea() {
+  let tempIcon = "x";
+  areas.forEach((area) => {
+    const occupiedDiv = document.createElement("div");
+    occupiedDiv.classList.add("occupied");
+    occupiedDiv.setAttribute("data-player", tempIcon);
+    area.appendChild(occupiedDiv);
+    tempIcon = tempIcon === "x" ? "o" : "x";
+  });
+  renderOccupiedAreas();
+}
+
+function renderOccupiedAreas() {
+  const occupiedAreas = document.querySelectorAll(".occupied");
+  occupiedAreas.forEach((area) => {
+    const playerData = area.getAttribute("data-player");
+    const icon = playerData === "x" ? xIcon : oIcon;
+    if (!hasChildWithClass(area, "active-icon")) {
+      const activeIcon = document.createElement("img");
+      activeIcon.classList.add("active-icon");
+      activeIcon.setAttribute("src", icon);
+      area.append(activeIcon);
+    }
+  });
+}
+
+function hasChildWithClass(parent, className) {
+  return parent.querySelector(`.${className}`) !== null;
+}
+
+initialiseArea();
+
+// Menu Button Functionality
+
+const vsPlayerButtons = document.querySelectorAll(".vs-player");
+const coinflipModal = document.querySelector(".coinflip-container");
+
+vsPlayerButtons.forEach((vsPlayer) => {
+  vsPlayer.addEventListener("click", () => {
+    game.newCurrentActive();
+    overlay.toggleAttribute("data-visible");
+    modal.toggleAttribute("data-visible");
+    coinflipModal.toggleAttribute("data-visible");
+    animate(game.currentActive);
+  });
+});
+
+// Coinflip Functionality
 const iconAnimation = document.querySelector(".coinflip-animation");
 const coinflipResultText = document.querySelector(".coinflip-result");
 
 function animate(playerIcon) {
-  const threshold = 15;
+  const threshold = 10;
   let nextIcon = xIcon;
   let counter = 0;
+  coinflipResultText.innerText = "...";
+  if (iconAnimation.hasAttribute("data-no-animation")) {
+    iconAnimation.toggleAttribute("data-no-animation");
+  }
   const intervalID = setInterval(() => {
     nextIcon = nextIcon === xIcon ? oIcon : xIcon;
     iconAnimation.setAttribute("src", nextIcon);
@@ -53,8 +180,12 @@ function animate(playerIcon) {
       clearInterval(intervalID);
       const finalIcon = playerIcon === "x" ? xIcon : oIcon;
       iconAnimation.setAttribute("src", finalIcon);
-      iconAnimation.style.animation = "none";
+      iconAnimation.toggleAttribute("data-no-animation");
       showCoinflipResult(playerIcon);
+      setTimeout(() => {
+        closeOverlay();
+        start();
+      }, 1000);
     }
   }, 300);
 }
@@ -64,4 +195,71 @@ function showCoinflipResult(playerIcon) {
   coinflipResultText.innerText = `${playerIcon.toUpperCase()}-player's turn first`;
 }
 
-animate("o");
+// Initialise Game
+
+const turnMessage = document.querySelector(".turn-message");
+const lines = document.querySelectorAll(".line");
+
+function start() {
+  game.state = "playing";
+  game.resetArea();
+  lineReset();
+  const occupiedAreas = document.querySelectorAll(".occupied");
+  turnMessage.setAttribute("data-player", game.currentActive);
+  turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
+  occupiedAreas.forEach((occupied) => {
+    occupied.remove();
+  });
+  areas.forEach((area) => {
+    area.addEventListener("click", () => {
+      if (!hasChildWithClass(area, "occupied") && game.state === "playing") {
+        const areaID = `area${area.getAttribute("id").slice(-1)}`;
+        game.areasObject[areaID] = game.currentActive;
+        const occupiedDiv = document.createElement("div");
+        occupiedDiv.classList.add("occupied");
+        occupiedDiv.setAttribute("data-player", game.currentActive);
+        area.appendChild(occupiedDiv);
+        renderOccupiedAreas();
+        game.swapPlayer();
+        turnMessage.setAttribute("data-player", game.currentActive);
+        turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
+        renderLine(...game.checkWinner());
+      }
+    });
+  });
+}
+
+function lineReset() {
+  lines.forEach((line) => {
+    line.removeAttribute("data-visible");
+  });
+}
+
+function renderLine(hasWon, lineID, currentActive) {
+  if (hasWon === false) {
+    hasDraw();
+    return;
+  }
+  game.state = "resolved";
+  const line = document.querySelector(`.line-${lineID}`);
+  line.toggleAttribute("data-visible");
+  line.setAttribute("data-player", currentActive);
+  line.toggleAttribute("data-drawn");
+  turnMessage.setAttribute("data-player", currentActive);
+  turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
+}
+
+function hasDraw() {
+  let counter = 0;
+  for (const key in game.areasObject) {
+    if (game.areasObject[key] !== null) {
+      counter++;
+    }
+  }
+  console.log(counter);
+
+  if (counter > 8) {
+    turnMessage.innerText = "It's a DRAW";
+    game.state = "resolved";
+  }
+}
