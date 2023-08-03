@@ -52,34 +52,45 @@
       <div class="container">
         <div class="game">
           <div class="game-board-container">
+            <div class="turn-message-container">
+              <p class="turn-message" data-player="x">X-player's turn</p>
+            </div>
             <div class="game-board">
-              <div class="area area-1">
+              <button class="area area-1">
+                <div class="line | horizontal line-123"></div>
+                <div class="line | vertical line-147"></div>
+                <div class="line | horizontal line-159"></div>
                 <div class="occupied" data-player="x"></div>
-              </div>
-              <div class="area area-2">
+              </button>
+              <button class="area area-2">
+                <div class="line | vertical line-258"></div>
                 <div class="occupied" data-player="o"></div>
-              </div>
-              <div class="area area-3">
+              </button>
+              <button class="area area-3">
+                <div class="line | vertical line-369"></div>
                 <div class="occupied" data-player="x"></div>
-              </div>
-              <div class="area area-4">
+              </button>
+              <button class="area area-4">
+                <div class="line | horizontal line-456"></div>
                 <div class="occupied" data-player="o"></div>
-              </div>
-              <div class="area area-5">
+              </button>
+              <button class="area area-5">
                 <div class="occupied" data-player="x"></div>
-              </div>
-              <div class="area area-6">
+              </button>
+              <button class="area area-6">
                 <div class="occupied" data-player="o"></div>
-              </div>
-              <div class="area area-7">
+              </button>
+              <button class="area area-7">
+                <div class="line | horizontal line-789"></div>
+                <div class="line | horizontal line-753"></div>
                 <div class="occupied" data-player="x"></div>
-              </div>
-              <div class="area area-8">
+              </button>
+              <button class="area area-8">
                 <div class="occupied" data-player="o"></div>
-              </div>
-              <div class="area area-9">
+              </button>
+              <button class="area area-9">
                 <div class="occupied" data-player="x"></div>
-              </div>
+              </button>
             </div>
           </div>
           <div class="menu-container">
@@ -100,5 +111,29 @@
         </div>
       </div>
     </main>
+    <div class="overlay"></div>
+    <div class="modal">
+      <div class="modal-content | choice-container">
+        <button class="close"><img src="assets/images/x.png" alt="" /></button>
+        <div class="choice-text">
+          <p class="choice-title">
+            Choose your mark X or <span class="O">O</span>?
+          </p>
+        </div>
+        <div class="choice-options">
+          <button class="x-choice">X</button>
+          <button class="o-choice">O</button>
+        </div>
+      </div>
+
+      <div class="modal-content | coinflip-container">
+        <button class="close"><img src="assets/images/x.png" alt="" /></button>
+        <p class="coinflip-title">Deciding who goes first... 50/50</p>
+        <div class="coinflip">
+          <img class="coinflip-animation" src="assets/images/x.png" alt="" />
+        </div>
+        <p class="coinflip-result">...</p>
+      </div>
+    </div>
   </body>
 </html>

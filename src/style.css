@@ -83,6 +83,13 @@ svg {
   display: block;
 }
 
+/* Remove default buttons */
+
+button {
+  background: none;
+  border-style: none;
+}
+
 /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {
@@ -201,8 +208,25 @@ main {
 }
 
 .game-board-container {
+  position: relative;
   display: grid;
   place-items: center;
+}
+
+.turn-message-container {
+  position: absolute;
+  top: 5%;
+  margin: auto 0;
+  font-size: var(--size-500);
+  font-weight: var(--fw-bold);
+}
+
+.turn-message[data-player="x"] {
+  color: var(--clr-primary-600);
+}
+
+.turn-message[data-player="o"] {
+  color: var(--clr-secondary-600);
 }
 
 .game-board {
@@ -212,10 +236,62 @@ main {
 }
 
 .area {
+  position: relative;
   display: grid;
   place-items: center;
   width: 8em;
   aspect-ratio: 1/1;
+  cursor: pointer;
+}
+
+.line[data-visible] {
+  display: block;
+  position: absolute;
+  z-index: 2;
+}
+
+.line {
+  display: none;
+}
+
+.line[data-player="x"] {
+  background-color: var(--clr-primary-600);
+}
+
+.line[data-player="o"] {
+  background-color: var(--clr-secondary-600);
+}
+
+.horizontal[data-drawn] {
+  width: 300%;
+  height: var(--size-300);
+  left: 0;
+}
+
+.horizontal {
+  width: 0;
+  transition: width 150ms ease-in-out;
+}
+
+.vertical[data-drawn] {
+  width: var(--size-300);
+  height: 300%;
+  top: 0;
+}
+
+.vertical {
+  height: 0;
+  transition: height 150ms ease-in-out;
+}
+
+.line-159 {
+  bottom: -55%;
+  transform: rotate(45deg);
+}
+
+.line-753 {
+  top: -55%;
+  transform: rotate(135deg);
 }
 
 .area-1 {
@@ -286,7 +362,7 @@ main {
 .menu {
   background-color: white;
   padding: var(--size-600);
-  border-radius: var(--size-300);
+  border-radius: var(--size-400);
   display: grid;
   place-items: center;
   gap: var(--size-500);
@@ -331,8 +407,155 @@ main {
   transition: color 300ms, background-color 300ms;
 }
 
-.button-primary:hover,
-.button-primary:active {
+.button-primary:hover {
   color: var(--clr-primary-600);
   background-color: var(--clr-secondary-600);
+}
+
+.button-primary:active {
+  opacity: 0.7;
+}
+
+/* Overlay */
+
+.overlay {
+  display: none;
+}
+
+.overlay[data-visible] {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.model {
+  display: none;
+}
+
+.modal[data-visible] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  z-index: 2;
+}
+
+.close {
+  position: absolute;
+  top: 3%;
+  right: 3%;
+  width: 1em;
+  aspect-ratio: 1/1;
+  cursor: pointer;
+}
+
+.modal-content {
+  position: relative;
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr;
+  gap: var(--size-600);
+  padding-block: var(--size-700);
+  padding-inline: var(--size-500);
+  border-radius: var(--size-400);
+  background-color: white;
+  font-size: var(--size-600);
+  font-weight: var(--fw-bold);
+}
+
+/* Choice */
+
+.choice-container {
+  display: none;
+}
+
+.choice-container[data-visible] {
+  display: grid;
+}
+
+.O {
+  color: var(--clr-secondary-600);
+}
+
+.choice-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
+  gap: var(--size-600);
+}
+
+.choice-options button {
+  color: white;
+  padding-block: var(--size-400);
+  padding-inline: var(--size-600);
+  border-radius: var(--size-200);
+}
+
+.x-choice {
+  background-color: var(--clr-primary-600);
+}
+
+.x-choice:hover {
+  opacity: 0.7;
+}
+
+.x-choice:active {
+  opacity: 0.5;
+}
+
+.o-choice {
+  background-color: var(--clr-secondary-600);
+}
+
+.o-choice:hover {
+  opacity: 0.7;
+}
+
+.o-choice:active {
+  opacity: 0.5;
+}
+
+/* Coinflip */
+
+.coinflip-container {
+  display: none;
+}
+
+.coinflip-container[data-visible] {
+  display: grid;
+}
+
+.coinflip-animation {
+  width: var(--size-900);
+  aspect-ratio: 1/1;
+  animation: fade-in-out 300ms ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0%;
+  }
+
+  100% {
+    opacity: 100%;
+  }
+}
+
+.coinflip-result[data-player="x"] {
+  color: var(--clr-primary-600);
+}
+
+.coinflip-result[data-player="o"] {
+  color: var(--clr-secondary-600);
 }
