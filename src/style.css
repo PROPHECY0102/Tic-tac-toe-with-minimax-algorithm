@@ -563,3 +563,33 @@ main {
 .coinflip-result[data-player="o"] {
   color: var(--clr-secondary-600);
 }
+
+/* Notification */
+
+.notification-container {
+  position: fixed;
+  top: 95%;
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.notification {
+  color: white;
+  background-color: var(--clr-secondary-600);
+  font-weight: var(--fw-bold);
+  display: grid;
+  place-items: center;
+  width: 98%;
+  border-radius: var(--size-500);
+  padding-block: var(--size-200);
+}
+
+.notification-text span {
+  color: var(--clr-primary-600);
+}
+
+.notification-text a {
+  color: white;
+  text-decoration: underline;
+}

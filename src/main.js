@@ -64,7 +64,8 @@ const game = {
   oPlayerScore: 0,
   areasObject,
   patterns,
-  state: "playing",
+  state: "resolved",
+  currentStatus: [],
 
   newCurrentActive() {
     const rand = Math.random();
@@ -87,20 +88,25 @@ const game = {
       match1 = game.areasObject[game.patterns[key][0]];
       match2 = game.areasObject[game.patterns[key][1]];
       match3 = game.areasObject[game.patterns[key][2]];
-      if (match1 === "x" && match2 === "x" && match3 === "x") {
-        const lineID = `${game.patterns[key][0].slice(-1)}${game.patterns[
-          key
-        ][1].slice(-1)}${game.patterns[key][2].slice(-1)}`;
-        return [true, lineID, "x"];
-      }
-      if (match1 === "o" && match2 === "o" && match3 === "o") {
-        const lineID = `${game.patterns[key][0].slice(-1)}${game.patterns[
-          key
-        ][1].slice(-1)}${game.patterns[key][2].slice(-1)}`;
-        return [true, lineID, "o"];
-      }
+      this.checkMatches("x", key, [match1, match2, match3]);
+      if (game.currentStatus[0] == true) break;
+      this.checkMatches("o", key, [match1, match2, match3]);
+      if (game.currentStatus[0] == true) break;
     }
-    return [false, null, null];
+    return game.currentStatus;
+  },
+
+  checkMatches(icon, key, [match1, match2, match3]) {
+    if (match1 === icon && match2 === icon && match3 === icon) {
+      let lineIDArray = [];
+      game.patterns[key].forEach((patternValue) => {
+        lineIDArray.push(patternValue.slice(-1));
+      });
+      const lineID = lineIDArray.join("");
+      game.currentStatus = [true, lineID, icon];
+      return;
+    }
+    game.currentStatus = [false, null, null];
   },
 
   resetArea() {
@@ -143,22 +149,29 @@ function hasChildWithClass(parent, className) {
   return parent.querySelector(`.${className}`) !== null;
 }
 
-initialiseArea();
-
 // Menu Button Functionality
 
 const vsPlayerButtons = document.querySelectorAll(".vs-player");
 const coinflipModal = document.querySelector(".coinflip-container");
 
-vsPlayerButtons.forEach((vsPlayer) => {
-  vsPlayer.addEventListener("click", () => {
-    game.newCurrentActive();
-    overlay.toggleAttribute("data-visible");
-    modal.toggleAttribute("data-visible");
-    coinflipModal.toggleAttribute("data-visible");
-    animate(game.currentActive);
+function initialiseMenu() {
+  vsPlayerEnable();
+}
+
+function vsPlayerEnable() {
+  vsPlayerButtons.forEach((vsPlayer) => {
+    vsPlayer.addEventListener("click", coinflip);
   });
-});
+}
+
+function coinflip() {
+  game.state = "resolved";
+  game.newCurrentActive();
+  overlay.toggleAttribute("data-visible");
+  modal.toggleAttribute("data-visible");
+  coinflipModal.toggleAttribute("data-visible");
+  animate(game.currentActive);
+}
 
 // Coinflip Functionality
 const iconAnimation = document.querySelector(".coinflip-animation");
@@ -198,18 +211,21 @@ function showCoinflipResult(playerIcon) {
 // Initialise Game
 
 const turnMessage = document.querySelector(".turn-message");
-const lines = document.querySelectorAll(".line");
+
+function changeTurnMessage() {
+  turnMessage.setAttribute("data-player", game.currentActive);
+  turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
+}
 
 function start() {
   game.state = "playing";
   game.resetArea();
   lineReset();
   const occupiedAreas = document.querySelectorAll(".occupied");
-  turnMessage.setAttribute("data-player", game.currentActive);
-  turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
   occupiedAreas.forEach((occupied) => {
     occupied.remove();
   });
+  changeTurnMessage();
   areas.forEach((area) => {
     area.addEventListener("click", () => {
       if (!hasChildWithClass(area, "occupied") && game.state === "playing") {
@@ -221,32 +237,41 @@ function start() {
         area.appendChild(occupiedDiv);
         renderOccupiedAreas();
         game.swapPlayer();
-        turnMessage.setAttribute("data-player", game.currentActive);
-        turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
-        renderLine(...game.checkWinner());
+        changeTurnMessage();
+        checkStatus(game.checkWinner());
       }
     });
   });
 }
 
-function lineReset() {
-  lines.forEach((line) => {
-    line.removeAttribute("data-visible");
-  });
-}
-
-function renderLine(hasWon, lineID, currentActive) {
+function checkStatus([hasWon, lineID, currentActive]) {
   if (hasWon === false) {
     hasDraw();
     return;
   }
   game.state = "resolved";
+  console.log(lineID);
+  renderLine(lineID, currentActive);
+  turnMessage.setAttribute("data-player", currentActive);
+  turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
+}
+
+const lines = document.querySelectorAll(".line");
+
+function lineReset() {
+  lines.forEach((line) => {
+    line.removeAttribute("data-visible");
+    line.removeAttribute("data-drawn");
+  });
+}
+
+function renderLine(lineID, currentActive) {
   const line = document.querySelector(`.line-${lineID}`);
   line.toggleAttribute("data-visible");
   line.setAttribute("data-player", currentActive);
-  line.toggleAttribute("data-drawn");
-  turnMessage.setAttribute("data-player", currentActive);
-  turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
+  setTimeout(() => {
+    line.toggleAttribute("data-drawn");
+  }, 10);
 }
 
 function hasDraw() {
@@ -256,10 +281,16 @@ function hasDraw() {
       counter++;
     }
   }
-  console.log(counter);
 
   if (counter > 8) {
     turnMessage.innerText = "It's a DRAW";
     game.state = "resolved";
   }
 }
+
+function init() {
+  initialiseArea();
+  initialiseMenu();
+}
+
+init();
