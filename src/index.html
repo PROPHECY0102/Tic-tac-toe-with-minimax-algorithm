@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="" />
+    <link rel="icon" type="image/svg+xml" href="assets/images/o.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,7 +10,6 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap"
       rel="stylesheet"
     />
-
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js" defer></script>
     <title>Tic Tac Toe</title>
@@ -104,12 +103,30 @@
         <button class="close"><img src="assets/images/x.png" alt="" /></button>
         <div class="choice-text">
           <p class="choice-title">
-            Choose your mark X or <span class="O">O</span>?
+            Choose your mark X or <span class="highlighted">O</span>?
           </p>
         </div>
-        <div class="choice-options">
-          <button class="x-choice">X</button>
-          <button class="o-choice">O</button>
+        <div class="options | choice-options">
+          <button class="first-choice | x-choice" data-player="x">X</button>
+          <button class="second-choice | o-choice" data-player="o">O</button>
+        </div>
+      </div>
+
+      <div class="modal-content | difficulty-container">
+        <button class="close"><img src="assets/images/x.png" alt="" /></button>
+        <div class="difficulty-text">
+          <p class="difficulty-title">
+            Choose your difficulty Easy or
+            <span class="highlighted">Hard</span>?
+          </p>
+        </div>
+        <div class="options | difficulty-options">
+          <button class="first-choice | easy" data-difficulty="easy">
+            Easy
+          </button>
+          <button class="second-choice | hard" data-difficulty="hard">
+            Hard
+          </button>
         </div>
       </div>
 
@@ -123,9 +140,9 @@
       </div>
     </div>
 
-    <div class="notification-container">
-      <div class="notification">
-        <p class="notification-text">
+    <div class="footer-container">
+      <div class="footer">
+        <p class="footer-text">
           Copyright &#169; All Rights Reserved.
           <span>Tic Tac Toe v1.0.1Beta by PROPHECY.</span> Please provide
           feedback

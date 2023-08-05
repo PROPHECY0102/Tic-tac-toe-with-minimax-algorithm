@@ -24,6 +24,9 @@ closeIcons.forEach((close) => {
 });
 
 function closeOverlay() {
+  if (!overlay.hasAttribute("data-visible")) {
+    return;
+  }
   overlay.toggleAttribute("data-visible");
   modal.toggleAttribute("data-visible");
   modalContents.forEach((content) => {
@@ -60,12 +63,19 @@ const patterns = {
 
 const game = {
   currentActive: "x",
+  mode: "player",
+  botActive: "x",
+  difficulty: "easy",
   xPlayerScore: 0,
   oPlayerScore: 0,
   areasObject,
   patterns,
   state: "resolved",
-  currentStatus: [],
+  currentStatus: {
+    hasWon: null,
+    lineID: null,
+    currentActive: null,
+  },
 
   newCurrentActive() {
     const rand = Math.random();
@@ -80,6 +90,28 @@ const game = {
     return game.currentActive === "x" ? xIcon : oIcon;
   },
 
+  botChoosesMove() {
+    if (game.difficulty === "easy") {
+      return this.easyBot();
+    } else {
+      return this.hardBot();
+    }
+  },
+
+  easyBot(counter = 1) {
+    if (counter < 10) {
+      const id = Math.floor(Math.random() * 9) + 1;
+      const area = `area${id}`;
+      if (game.areasObject[area] === "x" || game.areasObject[area] === "o") {
+        counter++;
+        return this.easyBot(counter);
+      }
+      return area;
+    }
+  },
+
+  hardBot() {},
+
   checkWinner() {
     let match1;
     let match2;
@@ -89,9 +121,9 @@ const game = {
       match2 = game.areasObject[game.patterns[key][1]];
       match3 = game.areasObject[game.patterns[key][2]];
       this.checkMatches("x", key, [match1, match2, match3]);
-      if (game.currentStatus[0] == true) break;
+      if (game.currentStatus.hasWon == true) break;
       this.checkMatches("o", key, [match1, match2, match3]);
-      if (game.currentStatus[0] == true) break;
+      if (game.currentStatus.hasWon == true) break;
     }
     return game.currentStatus;
   },
@@ -103,10 +135,14 @@ const game = {
         lineIDArray.push(patternValue.slice(-1));
       });
       const lineID = lineIDArray.join("");
-      game.currentStatus = [true, lineID, icon];
+      game.currentStatus.hasWon = true;
+      game.currentStatus.lineID = lineID;
+      game.currentStatus.currentActive = icon;
       return;
     }
-    game.currentStatus = [false, null, null];
+    game.currentStatus.hasWon = false;
+    game.currentStatus.lineID = null;
+    game.currentStatus.currentActive = null;
   },
 
   resetArea() {
@@ -133,14 +169,14 @@ function initialiseArea() {
 
 function renderOccupiedAreas() {
   const occupiedAreas = document.querySelectorAll(".occupied");
-  occupiedAreas.forEach((area) => {
-    const playerData = area.getAttribute("data-player");
-    const icon = playerData === "x" ? xIcon : oIcon;
-    if (!hasChildWithClass(area, "active-icon")) {
+  occupiedAreas.forEach((occupiedArea) => {
+    const playerData = occupiedArea.getAttribute("data-player");
+    const iconSrc = playerData === "x" ? xIcon : oIcon;
+    if (!hasChildWithClass(occupiedArea, "active-icon")) {
       const activeIcon = document.createElement("img");
       activeIcon.classList.add("active-icon");
-      activeIcon.setAttribute("src", icon);
-      area.append(activeIcon);
+      activeIcon.setAttribute("src", iconSrc);
+      occupiedArea.append(activeIcon);
     }
   });
 }
@@ -149,35 +185,105 @@ function hasChildWithClass(parent, className) {
   return parent.querySelector(`.${className}`) !== null;
 }
 
-// Menu Button Functionality
+function hasChildWithID(parent, id) {
+  return parent.querySelector(`#${id}`) !== null;
+}
+
+// Menu Button Functionality-----------------------------------------------------------
 
 const vsPlayerButtons = document.querySelectorAll(".vs-player");
-const coinflipModal = document.querySelector(".coinflip-container");
+const vsBotButtons = document.querySelectorAll(".vs-bots");
 
 function initialiseMenu() {
   vsPlayerEnable();
+  vsBotsEnable();
 }
 
 function vsPlayerEnable() {
   vsPlayerButtons.forEach((vsPlayer) => {
-    vsPlayer.addEventListener("click", coinflip);
+    vsPlayer.addEventListener("click", newVsPlayerGame);
   });
 }
 
-function coinflip() {
+function vsBotsEnable() {
+  vsBotButtons.forEach((vsBot) => {
+    vsBot.addEventListener("click", newVsBotGame);
+  });
+}
+
+function newVsPlayerGame() {
+  game.mode = "player";
   game.state = "resolved";
   game.newCurrentActive();
+  displayCoinflip();
+}
+
+function newVsBotGame() {
+  game.mode = "bot";
+  game.state = "resolved";
+  game.newCurrentActive();
+  displayChoice();
+}
+
+// Choose Player Icon (vs bot mode)
+const choiceModal = document.querySelector(".choice-container");
+const xChoice = document.querySelector(".x-choice");
+const oChoice = document.querySelector(".o-choice");
+
+function displayChoice() {
   overlay.toggleAttribute("data-visible");
   modal.toggleAttribute("data-visible");
-  coinflipModal.toggleAttribute("data-visible");
-  animate(game.currentActive);
+  choiceModal.toggleAttribute("data-visible");
+  choice();
+}
+
+function choice() {
+  const choiceButtons = [xChoice, oChoice];
+  choiceButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      game.botActive = button.getAttribute("data-player") === "x" ? "o" : "x";
+      closeOverlay();
+      displayDifficultyModal();
+    });
+  });
+}
+
+// Difficulty Selection (vs bot mode)
+const difficultyModal = document.querySelector(".difficulty-container");
+const easyButton = document.querySelector(".easy");
+const hardButton = document.querySelector(".hard");
+
+function displayDifficultyModal() {
+  overlay.toggleAttribute("data-visible");
+  modal.toggleAttribute("data-visible");
+  difficultyModal.toggleAttribute("data-visible");
+  difficultySelection();
+}
+
+function difficultySelection() {
+  const difficultyButtons = [easyButton, hardButton];
+  difficultyButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      game.difficulty = button.getAttribute("data-difficulty");
+      closeOverlay();
+      displayCoinflip();
+    });
+  });
 }
 
 // Coinflip Functionality
+const coinflipModal = document.querySelector(".coinflip-container");
 const iconAnimation = document.querySelector(".coinflip-animation");
 const coinflipResultText = document.querySelector(".coinflip-result");
 
-function animate(playerIcon) {
+function displayCoinflip() {
+  overlay.toggleAttribute("data-visible");
+  modal.toggleAttribute("data-visible");
+  coinflipModal.toggleAttribute("data-visible");
+  animateCoinflip(game.currentActive);
+}
+
+function animateCoinflip(playerIcon) {
   const threshold = 10;
   let nextIcon = xIcon;
   let counter = 0;
@@ -211,6 +317,7 @@ function showCoinflipResult(playerIcon) {
 // Initialise Game
 
 const turnMessage = document.querySelector(".turn-message");
+const gameBoard = document.querySelector(".game");
 
 function changeTurnMessage() {
   turnMessage.setAttribute("data-player", game.currentActive);
@@ -226,36 +333,113 @@ function start() {
     occupied.remove();
   });
   changeTurnMessage();
+  setTimeout(() => {
+    if (game.mode === "bot") botsTurn();
+  }, 10);
+  gameBoard.setAttribute("data-player", game.currentActive);
   areas.forEach((area) => {
-    area.addEventListener("click", () => {
-      if (!hasChildWithClass(area, "occupied") && game.state === "playing") {
-        const areaID = `area${area.getAttribute("id").slice(-1)}`;
-        game.areasObject[areaID] = game.currentActive;
-        const occupiedDiv = document.createElement("div");
-        occupiedDiv.classList.add("occupied");
-        occupiedDiv.setAttribute("data-player", game.currentActive);
-        area.appendChild(occupiedDiv);
-        renderOccupiedAreas();
-        game.swapPlayer();
-        changeTurnMessage();
-        checkStatus(game.checkWinner());
-      }
-    });
+    area.addEventListener("click", areaClickEvent);
+    area.addEventListener("pointerenter", areaHoverEvent);
+    area.addEventListener("pointerleave", removeHoverIcon);
   });
 }
 
-function checkStatus([hasWon, lineID, currentActive]) {
-  if (hasWon === false) {
-    hasDraw();
-    return;
+// Handling Bot Actions
+function botsTurn() {
+  if (game.botActive === game.currentActive) {
+    const areaID = game.botChoosesMove();
+    game.areasObject[areaID] = game.currentActive;
+    const areaOccupying = document.querySelector(`.area-${areaID.slice(-1)}`);
+    const occupiedDiv = document.createElement("div");
+    occupiedDiv.classList.add("occupied");
+    occupiedDiv.setAttribute("data-player", game.currentActive);
+    areaOccupying.appendChild(occupiedDiv);
+    renderOccupiedAreas();
+    game.swapPlayer();
+    changeTurnMessage();
+    checkStatus(game.checkWinner());
   }
-  game.state = "resolved";
-  console.log(lineID);
-  renderLine(lineID, currentActive);
-  turnMessage.setAttribute("data-player", currentActive);
-  turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
 }
 
+// Handling Player Actions
+function areaClickEvent() {
+  if (!hasChildWithClass(this, "occupied") && game.state === "playing") {
+    removeHoverIcon();
+    const areaID = `area${this.getAttribute("id").slice(-1)}`;
+    game.areasObject[areaID] = game.currentActive;
+    const occupiedDiv = document.createElement("div");
+    occupiedDiv.classList.add("occupied");
+    occupiedDiv.setAttribute("data-player", game.currentActive);
+    this.appendChild(occupiedDiv);
+    renderOccupiedAreas();
+    game.swapPlayer();
+    changeTurnMessage();
+    checkStatus(game.checkWinner());
+  }
+}
+
+function areaHoverEvent() {
+  if (!hasChildWithClass(this, "occupied") && game.state === "playing") {
+    const activeIcon = document.createElement("img");
+    const iconSrc = game.getIcon();
+    activeIcon.setAttribute("src", iconSrc);
+    activeIcon.classList.add("active-icon");
+    activeIcon.setAttribute("id", "hover");
+    this.appendChild(activeIcon);
+  }
+}
+
+function removeHoverIcon() {
+  if (hasChildWithID(document.body, "hover")) {
+    document.querySelector("#hover").remove();
+  }
+}
+
+// Handling termination events
+function checkStatus(status) {
+  if (status.hasWon === false) {
+    hasDraw();
+    return false;
+  }
+  renderLine(status.lineID, status.currentActive);
+  resolved(false, status.currentActive);
+}
+
+function hasDraw() {
+  let counter = 0;
+  for (const key in game.areasObject) {
+    if (game.areasObject[key] !== null) {
+      counter++;
+    }
+  }
+  if (counter > 8) {
+    resolved(true, game.currentActive);
+  }
+  continueGame();
+}
+
+function continueGame() {
+  gameBoard.setAttribute("data-player", game.currentActive);
+  if (game.mode === "bot") botsTurn();
+}
+
+function resolved(hasDraw, currentActive) {
+  if (hasDraw) {
+    turnMessage.innerText = "It's a DRAW";
+  } else {
+    turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
+  }
+  game.state = "resolved";
+  gameBoard.setAttribute("data-player", currentActive);
+  turnMessage.setAttribute("data-player", currentActive);
+  areas.forEach((area) => {
+    area.removeEventListener("click", areaClickEvent);
+    area.removeEventListener("pointerenter", areaHoverEvent);
+    area.removeEventListener("pointerleave", removeHoverIcon);
+  });
+}
+
+// Render Winning Line
 const lines = document.querySelectorAll(".line");
 
 function lineReset() {
@@ -274,23 +458,22 @@ function renderLine(lineID, currentActive) {
   }, 10);
 }
 
-function hasDraw() {
-  let counter = 0;
-  for (const key in game.areasObject) {
-    if (game.areasObject[key] !== null) {
-      counter++;
-    }
-  }
+// Footer
 
-  if (counter > 8) {
-    turnMessage.innerText = "It's a DRAW";
-    game.state = "resolved";
-  }
+const footer = document.querySelector(".footer");
+
+function showFooterOnInit() {
+  footer.toggleAttribute("data-visible");
+  setTimeout(() => {
+    footer.toggleAttribute("data-visible");
+  }, 5000);
 }
 
+// Initialise
 function init() {
   initialiseArea();
   initialiseMenu();
+  showFooterOnInit();
 }
 
 init();
