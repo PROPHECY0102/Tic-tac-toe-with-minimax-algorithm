@@ -1,5 +1,9 @@
 "strict mode";
 
+// Game object from game.js
+import game from "./game.js";
+import { hasChildWithClass, hasChildWithID } from "./game.js";
+
 import githubIcon from "./assets/images/github.png";
 import twitterIcon from "./assets/images/twitter.png";
 import xIcon from "./assets/images/x.png";
@@ -36,122 +40,6 @@ function closeOverlay() {
   });
 }
 
-// Game Object
-
-const areasObject = {
-  area1: null,
-  area2: null,
-  area3: null,
-  area4: null,
-  area5: null,
-  area6: null,
-  area7: null,
-  area8: null,
-  area9: null,
-};
-
-const patterns = {
-  pattern1: ["area1", "area2", "area3"],
-  pattern2: ["area1", "area4", "area7"],
-  pattern3: ["area1", "area5", "area9"],
-  pattern4: ["area2", "area5", "area8"],
-  pattern5: ["area3", "area6", "area9"],
-  pattern6: ["area4", "area5", "area6"],
-  pattern7: ["area7", "area8", "area9"],
-  pattern8: ["area7", "area5", "area3"],
-};
-
-const game = {
-  currentActive: "x",
-  mode: "player",
-  botActive: "x",
-  difficulty: "easy",
-  xPlayerScore: 0,
-  oPlayerScore: 0,
-  areasObject,
-  patterns,
-  state: "resolved",
-  currentStatus: {
-    hasWon: null,
-    lineID: null,
-    currentActive: null,
-  },
-
-  newCurrentActive() {
-    const rand = Math.random();
-    game.currentActive = rand >= 0.5 ? "x" : "o";
-  },
-
-  swapPlayer() {
-    game.currentActive = game.currentActive === "x" ? "o" : "x";
-  },
-
-  getIcon() {
-    return game.currentActive === "x" ? xIcon : oIcon;
-  },
-
-  botChoosesMove() {
-    if (game.difficulty === "easy") {
-      return this.easyBot();
-    } else {
-      return this.hardBot();
-    }
-  },
-
-  easyBot(counter = 1) {
-    if (counter < 10) {
-      const id = Math.floor(Math.random() * 9) + 1;
-      const area = `area${id}`;
-      if (game.areasObject[area] === "x" || game.areasObject[area] === "o") {
-        counter++;
-        return this.easyBot(counter);
-      }
-      return area;
-    }
-  },
-
-  hardBot() {},
-
-  checkWinner() {
-    let match1;
-    let match2;
-    let match3;
-    for (const key in game.patterns) {
-      match1 = game.areasObject[game.patterns[key][0]];
-      match2 = game.areasObject[game.patterns[key][1]];
-      match3 = game.areasObject[game.patterns[key][2]];
-      this.checkMatches("x", key, [match1, match2, match3]);
-      if (game.currentStatus.hasWon == true) break;
-      this.checkMatches("o", key, [match1, match2, match3]);
-      if (game.currentStatus.hasWon == true) break;
-    }
-    return game.currentStatus;
-  },
-
-  checkMatches(icon, key, [match1, match2, match3]) {
-    if (match1 === icon && match2 === icon && match3 === icon) {
-      let lineIDArray = [];
-      game.patterns[key].forEach((patternValue) => {
-        lineIDArray.push(patternValue.slice(-1));
-      });
-      const lineID = lineIDArray.join("");
-      game.currentStatus.hasWon = true;
-      game.currentStatus.lineID = lineID;
-      game.currentStatus.currentActive = icon;
-      return;
-    }
-    game.currentStatus.hasWon = false;
-    game.currentStatus.lineID = null;
-    game.currentStatus.currentActive = null;
-  },
-
-  resetArea() {
-    for (const key in game.areasObject) {
-      game.areasObject[key] = null;
-    }
-  },
-};
-
 // Pre-Render Landing Page
 const areas = document.querySelectorAll(".area");
 
@@ -181,15 +69,7 @@ function renderOccupiedAreas() {
   });
 }
 
-function hasChildWithClass(parent, className) {
-  return parent.querySelector(`.${className}`) !== null;
-}
-
-function hasChildWithID(parent, id) {
-  return parent.querySelector(`#${id}`) !== null;
-}
-
-// Menu Button Functionality-----------------------------------------------------------
+// Menu Button Functionality
 
 const vsPlayerButtons = document.querySelectorAll(".vs-player");
 const vsBotButtons = document.querySelectorAll(".vs-bots");
@@ -414,6 +294,7 @@ function hasDraw() {
   }
   if (counter > 8) {
     resolved(true, game.currentActive);
+    return;
   }
   continueGame();
 }
