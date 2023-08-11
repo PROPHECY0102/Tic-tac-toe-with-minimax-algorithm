@@ -156,29 +156,24 @@ const game = {
     }
     simulatedGame.setActiveIcon();
 
-    let movesWithScores = [];
-    let possibleMoves = [];
     let bestScore = -Infinity;
+    let chosenArea;
+    const possibleMoves = [];
     simulatedGame.allAreas.forEach((areaString) => {
       if (!simulatedGame[areaString]) {
         possibleMoves.push(areaString);
       }
     });
     possibleMoves.forEach((area) => {
-      let move = {};
       simulatedGame[area] = simulatedGame.botActive;
-      let score = this.minimax(true, 0);
-      bestScore = score;
-      move = { area: area, score: bestScore };
-      movesWithScores.push(move);
-      console.log(movesWithScores);
+      let score = this.minimax(false, 0);
+      if (score > bestScore) {
+        bestScore = score;
+        chosenArea = area;
+      }
       simulatedGame[area] = null;
     });
-    const chosenArea = movesWithScores.reduce((previous, current) => {
-      return current.score > previous.score ? current : previous;
-    });
-    console.log(chosenArea);
-    return chosenArea.area;
+    return chosenArea;
   },
 
   minimax(isMaximizing, depth) {
@@ -186,10 +181,10 @@ const game = {
     if (simulatedGame.currentStatus.active === this.botActive) {
       return 10;
     }
-    if (simulatedGame.currentStatus.active === this.playerActive) {
+    if (simulatedGame.currentStatus.active === simulatedGame.playerActive) {
       return -10;
     }
-    let possibleMoves = [];
+    const possibleMoves = [];
     simulatedGame.allAreas.forEach((areaString) => {
       if (!simulatedGame[areaString]) {
         possibleMoves.push(areaString);
@@ -201,18 +196,21 @@ const game = {
       possibleMoves.forEach((area) => {
         simulatedGame[area] = simulatedGame.botActive;
         let score = this.minimax(false, depth + 1);
-        bestScore = Math.max(score, bestScore);
-        // console.log("1", area, score, simulatedGame.botActive, depth);
+        if (score > bestScore) {
+          bestScore = score;
+        }
         simulatedGame[area] = null;
       });
       return bestScore;
-    } else {
+    }
+    if (!isMaximizing) {
       let bestScore = Infinity;
       possibleMoves.forEach((area) => {
         simulatedGame[area] = simulatedGame.playerActive;
         let score = this.minimax(true, depth + 1);
-        bestScore = Math.min(score, bestScore);
-        // console.log("2", area, bestScore, simulatedGame.playerActive, depth);
+        if (score < bestScore) {
+          bestScore = score;
+        }
         simulatedGame[area] = null;
       });
       return bestScore;
