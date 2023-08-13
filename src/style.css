@@ -1,7 +1,7 @@
 :root {
   --clr-primary-600: rgb(30, 17, 87);
   --clr-secondary-600: rgb(242, 97, 0);
-  --clr-accent-600: rgb(255, 242, 208);
+  --clr-accent-600: #faf3f0;
 
   --font-icon: "Pacifico";
   --font-primary: "Inter";
@@ -113,7 +113,7 @@ body {
   font-size: var(--fs-paragrah);
   font-family: var(--font-primary);
   font-weight: var(--fw-regular);
-  background: linear-gradient(to top, rgb(255, 247, 230), rgb(255, 242, 208));
+  background-color: var(--clr-accent-600);
 }
 
 /* Utility Classes */
@@ -366,6 +366,7 @@ main {
 }
 
 /* Menu */
+/* New Game Menu */
 
 .menu-container {
   display: grid;
@@ -374,14 +375,16 @@ main {
 
 .menu {
   background-color: white;
+  box-shadow: 0.3rem 0.3rem var(--clr-secondary-600),
+    -0.3rem -0.3rem var(--clr-primary-600);
   padding: var(--size-600);
   border-radius: var(--size-400);
   display: grid;
   place-items: center;
-  gap: var(--size-500);
+  gap: var(--size-600);
 }
 
-.heading-text {
+.game-menu-text {
   font-size: var(--size-500);
   font-weight: var(--fw-bold);
   display: grid;
@@ -392,7 +395,7 @@ main {
   font-size: var(--size-400);
 }
 
-.current-message {
+.menu-sub-header {
   margin-top: var(--size-500);
 }
 
@@ -402,9 +405,14 @@ main {
 }
 
 .new-game-options {
+  display: none;
+}
+
+.new-game-options[data-visible] {
   display: grid;
   place-items: stretch;
   gap: var(--size-500);
+  margin-bottom: var(--size-700);
 }
 
 .button-primary {
@@ -427,6 +435,80 @@ main {
 
 .button-primary:active {
   opacity: 0.7;
+}
+
+/* Scoreboard Menu*/
+
+.scoreboard-display {
+  display: none;
+}
+
+.scoreboard-display[data-visible] {
+  display: block;
+}
+
+.icon-section {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  place-items: center;
+  font-size: var(--size-600);
+  font-weight: var(--fw-bold);
+}
+
+.icon-container {
+  position: relative;
+}
+
+.user[data-hidden] {
+  display: none;
+}
+
+.user {
+  font-size: 1.1rem;
+  position: absolute;
+  top: -40%;
+}
+
+.score-left {
+  color: var(--clr-primary-600);
+}
+
+.score-left[data-icon="o"] {
+  color: var(--clr-secondary-600);
+}
+
+.score-right {
+  color: var(--clr-secondary-600);
+}
+
+.score-right[data-icon="x"] {
+  color: var(--clr-primary-600);
+}
+
+.scoreboard-icon {
+  width: var(--size-800);
+  aspect-ratio: 1/1;
+}
+
+.condition-section {
+  display: grid;
+  place-items: stretch;
+  gap: var(--size-300);
+  font-size: var(--size-600);
+  font-weight: var(--fw-bold);
+}
+
+.condition-text {
+  place-self: center;
+}
+
+.condition-text[data-player="x"] {
+  color: var(--clr-primary-600);
+}
+
+.condition-text[data-player="o"] {
+  color: var(--clr-secondary-600);
 }
 
 /* Overlay */

@@ -19,9 +19,9 @@
       <nav class="primary-nav">
         <ul class="nav-list">
           <li><button class="new-game">New Game</button></li>
-          <li><button class="scoreboard">Scoreboard</button></li>
+          <li><button class="leaderboard">Leaderboard</button></li>
           <li><button class="vs-player">Vs Player</button></li>
-          <li><button class="vs-bots">Vs Bots</button></li>
+          <li><button class="vs-bots">Vs AI</button></li>
         </ul>
       </nav>
       <h1 class="title-logo">Tic <span class="tac">Tac</span> Toe</h1>
@@ -81,15 +81,49 @@
           </div>
           <div class="menu-container">
             <div class="menu">
-              <div class="heading-text">
-                <h2 class="title">Tic Tac Toe v1.0Beta</h2>
+              <div class="game-menu-text">
+                <h2 class="title">Tic Tac Toe v1.1</h2>
                 <p class="author">By PROPHECY | Entropy/エントロピ CORP</p>
-                <p class="current-message">Start a New Game of Tic Tac Toe?</p>
+                <p class="menu-sub-header">Start a New Game of Tic Tac Toe?</p>
               </div>
+
               <div class="info-container">
-                <div class="new-game-options">
+                <div class="new-game-options" data-visible>
                   <button class="button-primary | vs-player">Vs Player</button>
-                  <button class="button-primary | vs-bots">Vs Bots</button>
+                  <button class="button-primary | vs-bots">Vs AI</button>
+                </div>
+
+                <div class="scoreboard-display">
+                  <div class="icon-section">
+                    <div class="icon-container">
+                      <span class="user" data-hidden>You🤠</span>
+                      <img
+                        class="scoreboard-icon | image-left"
+                        src="assets/images/x.png"
+                        alt=""
+                      />
+                    </div>
+                    <p class="score | score-left">0</p>
+                    <p class="vs">vs</p>
+                    <p class="score | score-right">0</p>
+                    <div class="icon-container">
+                      <span class="user" data-hidden>AI🤖</span>
+                      <img
+                        class="scoreboard-icon | image-right"
+                        src="assets/images/o.png"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <div class="condition-section">
+                    <p class="condition-text">...</p>
+                    <button class="button-primary | new-round">
+                      Next Round
+                    </button>
+                    <button class="button-primary | reset-button">
+                      Reset Game
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -131,7 +165,6 @@
       </div>
 
       <div class="modal-content | coinflip-container">
-        <button class="close"><img src="assets/images/x.png" alt="" /></button>
         <p class="coinflip-title">Deciding who goes first... 50/50</p>
         <div class="coinflip">
           <img class="coinflip-animation" src="assets/images/x.png" alt="" />
@@ -144,9 +177,13 @@
       <div class="footer">
         <p class="footer-text">
           Copyright &#169; All Rights Reserved.
-          <span>Tic Tac Toe v1.0.1Beta by PROPHECY.</span> Please provide
+          <span>Tic Tac Toe v1.0.2Beta by PROPHECY.</span> Please provide
           feedback
-          <a href="#">here</a>
+          <a
+            href="https://github.com/PROPHECY0102/Tic-tac-toe-with-minimax-algorithm"
+            target="_blank"
+            >here</a
+          >
         </p>
       </div>
     </div>

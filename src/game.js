@@ -1,3 +1,5 @@
+"strict mode";
+
 import xIcon from "./assets/images/x.png";
 import oIcon from "./assets/images/o.png";
 
@@ -70,11 +72,14 @@ const patterns = {
 
 const game = {
   currentActive: "x",
-  mode: "player",
-  botActive: "x",
+  mode: null,
+  playerActive: null,
+  botActive: null,
   difficulty: "easy",
-  xPlayerScore: 0,
-  oPlayerScore: 0,
+  xScore: 0,
+  oScore: 0,
+  playerScore: 0,
+  botScore: 0,
   areasObject,
   patterns,
   state: "resolved",
@@ -86,52 +91,74 @@ const game = {
 
   newCurrentActive() {
     const rand = Math.random();
-    game.currentActive = rand >= 0.5 ? "x" : "o";
+    this.currentActive = rand >= 0.5 ? "x" : "o";
+  },
+
+  setActiveIcon(choice) {
+    this.playerActive = choice;
+    this.botActive = this.playerActive === "x" ? "o" : "x";
   },
 
   swapPlayer() {
-    game.currentActive = game.currentActive === "x" ? "o" : "x";
+    this.currentActive = this.currentActive === "x" ? "o" : "x";
   },
 
   getIcon() {
-    return game.currentActive === "x" ? xIcon : oIcon;
+    return this.currentActive === "x" ? xIcon : oIcon;
   },
 
   checkWinner() {
     let match1;
     let match2;
     let match3;
-    for (const key in game.patterns) {
-      match1 = game.areasObject[game.patterns[key][0]];
-      match2 = game.areasObject[game.patterns[key][1]];
-      match3 = game.areasObject[game.patterns[key][2]];
+    for (const key in this.patterns) {
+      match1 = this.areasObject[this.patterns[key][0]];
+      match2 = this.areasObject[this.patterns[key][1]];
+      match3 = this.areasObject[this.patterns[key][2]];
       this.checkMatches("x", key, [match1, match2, match3]);
-      if (game.currentStatus.hasWon == true) break;
+      if (this.currentStatus.hasWon == true) break;
       this.checkMatches("o", key, [match1, match2, match3]);
-      if (game.currentStatus.hasWon == true) break;
+      if (this.currentStatus.hasWon == true) break;
     }
-    return game.currentStatus;
+    this.incrementPoint();
+    return this.currentStatus;
   },
 
   checkMatches(icon, key, [match1, match2, match3]) {
     if (match1 === icon && match2 === icon && match3 === icon) {
       let lineIDArray = [];
-      game.patterns[key].forEach((patternValue) => {
+      this.patterns[key].forEach((patternValue) => {
         lineIDArray.push(patternValue.slice(-1));
       });
       const lineID = lineIDArray.join("");
-      game.currentStatus.hasWon = true;
-      game.currentStatus.lineID = lineID;
-      game.currentStatus.currentActive = icon;
+      this.currentStatus.hasWon = true;
+      this.currentStatus.lineID = lineID;
+      this.currentStatus.currentActive = icon;
       return;
     }
-    game.currentStatus.hasWon = false;
-    game.currentStatus.lineID = null;
-    game.currentStatus.currentActive = null;
+    this.currentStatus.hasWon = false;
+    this.currentStatus.lineID = null;
+    this.currentStatus.currentActive = null;
+  },
+
+  incrementPoint() {
+    if (this.mode === "player") this.incrementVsPlayer();
+    if (this.mode === "bot") this.incrementVsBot();
+  },
+
+  incrementVsPlayer() {
+    if (this.currentStatus.currentActive === "x") this.xScore++;
+    if (this.currentStatus.currentActive === "o") this.oScore++;
+  },
+
+  incrementVsBot() {
+    if (this.currentStatus.currentActive === this.playerActive)
+      this.playerScore++;
+    if (this.currentStatus.currentActive === this.botActive) this.botScore++;
   },
 
   botChoosesMove() {
-    if (game.difficulty === "easy") {
+    if (this.difficulty === "easy") {
       return this.easyBot();
     } else {
       return this.hardBot();
@@ -142,7 +169,7 @@ const game = {
     if (counter < 10) {
       const id = Math.floor(Math.random() * 9) + 1;
       const area = `area${id}`;
-      if (game.areasObject[area] === "x" || game.areasObject[area] === "o") {
+      if (this.areasObject[area] === "x" || this.areasObject[area] === "o") {
         counter++;
         return this.easyBot(counter);
       }
@@ -151,8 +178,8 @@ const game = {
   },
 
   hardBot() {
-    for (const key in game.areasObject) {
-      simulatedGame[key] = game.areasObject[key];
+    for (const key in this.areasObject) {
+      simulatedGame[key] = this.areasObject[key];
     }
     simulatedGame.setActiveIcon();
 
@@ -178,7 +205,7 @@ const game = {
 
   minimax(isMaximizing, depth) {
     game.simulateCheckWinner();
-    if (simulatedGame.currentStatus.active === this.botActive) {
+    if (simulatedGame.currentStatus.active === simulatedGame.botActive) {
       return 10;
     }
     if (simulatedGame.currentStatus.active === simulatedGame.playerActive) {
@@ -221,10 +248,10 @@ const game = {
     let match1;
     let match2;
     let match3;
-    for (const key in game.patterns) {
-      match1 = simulatedGame[game.patterns[key][0]];
-      match2 = simulatedGame[game.patterns[key][1]];
-      match3 = simulatedGame[game.patterns[key][2]];
+    for (const key in this.patterns) {
+      match1 = simulatedGame[this.patterns[key][0]];
+      match2 = simulatedGame[this.patterns[key][1]];
+      match3 = simulatedGame[this.patterns[key][2]];
       this.simulatedCheckMatches(simulatedGame.botActive, [
         match1,
         match2,
@@ -252,9 +279,16 @@ const game = {
   },
 
   resetArea() {
-    for (const key in game.areasObject) {
-      game.areasObject[key] = null;
+    for (const key in this.areasObject) {
+      this.areasObject[key] = null;
     }
+  },
+
+  resetScore() {
+    this.xScore = 0;
+    this.oScore = 0;
+    this.playerScore = 0;
+    this.botScore = 0;
   },
 };
 

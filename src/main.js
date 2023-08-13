@@ -21,16 +21,16 @@ const overlay = document.querySelector(".overlay");
 const modal = document.querySelector(".modal");
 const modalContents = document.querySelectorAll(".modal-content");
 
-closeIcons.forEach((close) => {
-  close.addEventListener("click", () => {
-    closeOverlay();
+function closeEnable() {
+  closeIcons.forEach((close) => {
+    close.addEventListener("click", () => {
+      closeOverlay();
+    });
   });
-});
+}
 
 function closeOverlay() {
-  if (!overlay.hasAttribute("data-visible")) {
-    return;
-  }
+  if (!overlay.hasAttribute("data-visible")) return;
   overlay.toggleAttribute("data-visible");
   modal.toggleAttribute("data-visible");
   modalContents.forEach((content) => {
@@ -69,14 +69,25 @@ function renderOccupiedAreas() {
   });
 }
 
-// Menu Button Functionality
+// Header and Menu Button Functionality
 
+const newGameButton = document.querySelector(".new-game");
 const vsPlayerButtons = document.querySelectorAll(".vs-player");
 const vsBotButtons = document.querySelectorAll(".vs-bots");
 
-function initialiseMenu() {
+function initialiseButtons() {
+  newGameEnable();
   vsPlayerEnable();
   vsBotsEnable();
+  closeEnable();
+  newRoundEnable();
+  resetEnable();
+}
+
+function newGameEnable() {
+  newGameButton.addEventListener("click", () => {
+    window.location.reload();
+  });
 }
 
 function vsPlayerEnable() {
@@ -121,7 +132,8 @@ function choice() {
   const choiceButtons = [xChoice, oChoice];
   choiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      game.botActive = button.getAttribute("data-player") === "x" ? "o" : "x";
+      const playerChoice = button.getAttribute("data-player");
+      game.setActiveIcon(playerChoice);
       closeOverlay();
       displayDifficultyModal();
     });
@@ -194,24 +206,187 @@ function showCoinflipResult(playerIcon) {
   coinflipResultText.innerText = `${playerIcon.toUpperCase()}-player's turn first`;
 }
 
-// Initialise Game
+// Game Menu Functionality
+
+const newGameOption = document.querySelector(".new-game-options");
+const menuHeaderText = document.querySelector(".menu-sub-header");
+const scoreboardMenu = document.querySelector(".scoreboard-display");
+const imageLeft = document.querySelector(".image-left");
+const imageRight = document.querySelector(".image-right");
+const scoreLeft = document.querySelector(".score-left");
+const scoreRight = document.querySelector(".score-right");
+const conditionText = document.querySelector(".condition-text");
+const newRoundButton = document.querySelector(".new-round");
+const resetButton = document.querySelector(".reset-button");
+
+const userDisplays = document.querySelectorAll(".user");
+
+function closeNewGameMenu() {
+  if (newGameOption.hasAttribute("data-visible")) {
+    newGameOption.toggleAttribute("data-visible");
+  }
+}
+
+function openNewGameMenu() {
+  if (!newGameOption.hasAttribute("data-visible")) {
+    newGameOption.toggleAttribute("data-visible");
+  }
+}
+
+function newRoundEnable() {
+  newRoundButton.addEventListener("click", () => {
+    conditionText.innerText = "...";
+    conditionText.removeAttribute("data-player");
+    game.newCurrentActive();
+    displayCoinflip();
+  });
+}
+
+function resetEnable() {
+  resetButton.addEventListener("click", () => {
+    transitionToNewGame();
+    game.state = "resolved";
+    game.resetArea();
+    game.resetScore();
+    game.newCurrentActive();
+    turnMessage.innerText = "Select a mode...";
+    changeMenuHeaderText("Start a New Game of Tic Tac Toe?");
+    conditionText.innerText = "...";
+    turnMessage.setAttribute("data-player", "x");
+    gameBoard.removeAttribute("data-player");
+    resetOccupiedAreas();
+    renderOccupiedAreas();
+    lineReset();
+  });
+}
+
+function openScoreboard() {
+  if (!scoreboardMenu.hasAttribute("data-visible")) {
+    scoreboardMenu.toggleAttribute("data-visible");
+  }
+  changeMenuHeaderText(scoreboardHeader());
+  if (game.mode === "bot") {
+    enableUserDisplay();
+    swapImage();
+  } else {
+    revertImage();
+  }
+  updateScore();
+}
+
+function closeScoreboard() {
+  if (scoreboardMenu.hasAttribute("data-visible")) {
+    scoreboardMenu.toggleAttribute("data-visible");
+  }
+}
+
+function changeMenuHeaderText(text) {
+  menuHeaderText.innerText = text;
+}
+
+function scoreboardHeader() {
+  if (game.mode === "player") {
+    return `Scoreboard - Vs Player Mode`;
+  }
+  const dif = game.difficulty === "easy" ? "Easy" : "Hard";
+  return `Scoreboard - Vs AI ${dif} Mode`;
+}
+
+function swapImage() {
+  if (game.playerActive === "o") {
+    imageLeft.setAttribute("src", oIcon);
+    imageRight.setAttribute("src", xIcon);
+    scoreLeft.setAttribute("data-icon", "o");
+    scoreRight.setAttribute("data-icon", "x");
+  } else {
+    revertImage();
+  }
+}
+
+function enableUserDisplay() {
+  userDisplays.forEach((userDisplay) => {
+    userDisplay.removeAttribute("data-hidden");
+  });
+}
+
+function revertImage() {
+  imageLeft.setAttribute("src", xIcon);
+  imageRight.setAttribute("src", oIcon);
+  scoreLeft.removeAttribute("data-icon");
+  scoreRight.removeAttribute("data-icon");
+  if (game.mode === "player") {
+    userDisplays.forEach((userDisplay) => {
+      userDisplay.setAttribute("data-hidden", "");
+    });
+  }
+}
+
+function updateScore() {
+  if (game.mode === "player") {
+    scoreLeft.innerText = game.xScore;
+    scoreRight.innerText = game.oScore;
+  } else {
+    scoreLeft.innerText = game.playerScore;
+    scoreRight.innerText = game.botScore;
+  }
+}
+
+function updateConditionText(currentActive) {
+  if (game.mode === "player") {
+    vsPlayerConditionText(currentActive);
+    return;
+  }
+  vsBotConditionText(currentActive);
+}
+
+function vsPlayerConditionText(currentActive) {
+  conditionText.innerText = `${currentActive.toUpperCase()}'s has Won 🎉`;
+  conditionText.setAttribute("data-player", currentActive);
+}
+
+function vsBotConditionText(currentActive) {
+  if (currentActive === game.playerActive) {
+    conditionText.setAttribute("data-player", currentActive);
+    conditionText.innerText = "You've Won 🎉";
+    return;
+  }
+  conditionText.setAttribute("data-player", game.botActive);
+  conditionText.innerText = "You've Lost 😔";
+}
+
+// Initialise Game / Game Board functionality
 
 const turnMessage = document.querySelector(".turn-message");
 const gameBoard = document.querySelector(".game");
+
+function transitionToScoreboard() {
+  closeNewGameMenu();
+  openScoreboard();
+}
+
+function transitionToNewGame() {
+  openNewGameMenu();
+  closeScoreboard();
+}
 
 function changeTurnMessage() {
   turnMessage.setAttribute("data-player", game.currentActive);
   turnMessage.innerText = `${game.currentActive.toUpperCase()}-player's turn`;
 }
 
-function start() {
-  game.state = "playing";
-  game.resetArea();
-  lineReset();
+function resetOccupiedAreas() {
   const occupiedAreas = document.querySelectorAll(".occupied");
   occupiedAreas.forEach((occupied) => {
     occupied.remove();
   });
+}
+
+function start() {
+  game.state = "playing";
+  game.resetArea();
+  lineReset();
+  resetOccupiedAreas();
+  transitionToScoreboard();
   changeTurnMessage();
   setTimeout(() => {
     if (game.mode === "bot") botsTurn();
@@ -306,10 +481,13 @@ function continueGame() {
 
 function resolved(hasDraw, currentActive) {
   if (hasDraw) {
-    turnMessage.innerText = "It's a DRAW";
+    turnMessage.innerText = "It's a TIE";
+    conditionText.innerText = "TIED 🙃";
   } else {
     turnMessage.innerText = `${currentActive.toUpperCase()}'s has Won`;
+    updateConditionText(currentActive);
   }
+  updateScore();
   game.state = "resolved";
   gameBoard.setAttribute("data-player", currentActive);
   turnMessage.setAttribute("data-player", currentActive);
@@ -353,7 +531,7 @@ function showFooterOnInit() {
 // Initialise
 function init() {
   initialiseArea();
-  initialiseMenu();
+  initialiseButtons();
   showFooterOnInit();
 }
 
