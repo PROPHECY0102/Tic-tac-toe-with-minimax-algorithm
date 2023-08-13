@@ -3,12 +3,16 @@
   "private": true,
   "version": "1.0.2",
   "type": "module",
+  "homepage": "https://prophecy0102.github.io/Tic-tac-toe-with-minimax-algorithm/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d src/dist",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "gh-pages": "^6.0.0",
     "vite": "^4.4.5"
   }
 }
