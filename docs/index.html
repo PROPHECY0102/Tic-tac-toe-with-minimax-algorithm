@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="assets/images/o.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="main.js" defer></script>
+    <title>Tic Tac Toe</title>
+  </head>
+  <body>
+    <header class="primary-header">
+      <nav class="primary-nav">
+        <ul class="nav-list">
+          <li><button class="new-game">New Game</button></li>
+          <li><button class="leaderboard">Leaderboard</button></li>
+          <li><button class="vs-player">Vs Player</button></li>
+          <li><button class="vs-bots">Vs AI</button></li>
+        </ul>
+      </nav>
+      <h1 class="title-logo">Tic <span class="tac">Tac</span> Toe</h1>
+      <nav class="secondary-nav">
+        <ul class="nav-list">
+          <li><button class="about">About</button></li>
+          <li>
+            <a
+              class="github"
+              href="https://github.com/PROPHECY0102"
+              target="_blank"
+              ><img src="" class="github-icon | logo-icon" alt=""
+            /></a>
+          </li>
+          <li>
+            <a
+              class="twitter"
+              href="https://twitter.com/Ctrlyourselfpls"
+              target="_blank"
+              ><img src="" class="twitter-icon | logo-icon" alt=""
+            /></a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="game">
+          <div class="game-board-container">
+            <div class="turn-message-container">
+              <p class="turn-message" data-player="x">...</p>
+            </div>
+            <div class="game-board">
+              <button class="area area-1" id="area-1">
+                <div class="line | horizontal line-123"></div>
+                <div class="line | vertical line-147"></div>
+                <div class="line | horizontal line-159"></div>
+              </button>
+              <button class="area area-2" id="area-2">
+                <div class="line | vertical line-258"></div>
+              </button>
+              <button class="area area-3" id="area-3">
+                <div class="line | vertical line-369"></div>
+              </button>
+              <button class="area area-4" id="area-4">
+                <div class="line | horizontal line-456"></div>
+              </button>
+              <button class="area area-5" id="area-5"></button>
+              <button class="area area-6" id="area-6"></button>
+              <button class="area area-7" id="area-7">
+                <div class="line | horizontal line-789"></div>
+                <div class="line | horizontal line-753"></div>
+              </button>
+              <button class="area area-8" id="area-8"></button>
+              <button class="area area-9" id="area-9"></button>
+            </div>
+          </div>
+          <div class="menu-container">
+            <div class="menu">
+              <div class="game-menu-text">
+                <h2 class="title">Tic Tac Toe v1.1</h2>
+                <p class="author">By PROPHECY | Entropy/エントロピ CORP</p>
+                <p class="menu-sub-header">Start a New Game of Tic Tac Toe?</p>
+              </div>
+
+              <div class="info-container">
+                <div class="new-game-options" data-visible>
+                  <button class="button-primary | vs-player">Vs Player</button>
+                  <button class="button-primary | vs-bots">Vs AI</button>
+                </div>
+
+                <div class="scoreboard-display">
+                  <div class="icon-section">
+                    <div class="icon-container">
+                      <span class="user" data-hidden>You🤠</span>
+                      <img
+                        class="scoreboard-icon | image-left"
+                        src="assets/images/x.png"
+                        alt=""
+                      />
+                    </div>
+                    <p class="score | score-left">0</p>
+                    <p class="vs">vs</p>
+                    <p class="score | score-right">0</p>
+                    <div class="icon-container">
+                      <span class="user" data-hidden>AI🤖</span>
+                      <img
+                        class="scoreboard-icon | image-right"
+                        src="assets/images/o.png"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <div class="condition-section">
+                    <p class="condition-text">...</p>
+                    <button class="button-primary | new-round">
+                      Next Round
+                    </button>
+                    <button class="button-primary | reset-button">
+                      Reset Game
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div class="overlay"></div>
+    <div class="modal">
+      <div class="modal-content | choice-container">
+        <button class="close"><img src="assets/images/x.png" alt="" /></button>
+        <div class="choice-text">
+          <p class="choice-title">
+            Choose your mark X or <span class="highlighted">O</span>?
+          </p>
+        </div>
+        <div class="options | choice-options">
+          <button class="first-choice | x-choice" data-player="x">X</button>
+          <button class="second-choice | o-choice" data-player="o">O</button>
+        </div>
+      </div>
+
+      <div class="modal-content | difficulty-container">
+        <button class="close"><img src="assets/images/x.png" alt="" /></button>
+        <div class="difficulty-text">
+          <p class="difficulty-title">
+            Choose your difficulty Easy or
+            <span class="highlighted">Hard</span>?
+          </p>
+        </div>
+        <div class="options | difficulty-options">
+          <button class="first-choice | easy" data-difficulty="easy">
+            Easy
+          </button>
+          <button class="second-choice | hard" data-difficulty="hard">
+            Hard
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-content | coinflip-container">
+        <p class="coinflip-title">Deciding who goes first... 50/50</p>
+        <div class="coinflip">
+          <img class="coinflip-animation" src="assets/images/x.png" alt="" />
+        </div>
+        <p class="coinflip-result">...</p>
+      </div>
+    </div>
+
+    <div class="footer-container">
+      <div class="footer">
+        <p class="footer-text">
+          Copyright &#169; All Rights Reserved.
+          <span>Tic Tac Toe v1.0.2Beta by PROPHECY.</span> Please provide
+          feedback
+          <a
+            href="https://github.com/PROPHECY0102/Tic-tac-toe-with-minimax-algorithm"
+            target="_blank"
+            >here</a
+          >
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
