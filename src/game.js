@@ -185,10 +185,9 @@ const game = {
 
     let bestScore = -Infinity;
     let chosenArea;
-    const possibleMoves = [];
-    simulatedGame.allAreas.forEach((areaString) => {
+    const possibleMoves = simulatedGame.allAreas.filter((areaString) => {
       if (!simulatedGame[areaString]) {
-        possibleMoves.push(areaString);
+        return areaString;
       }
     });
     possibleMoves.forEach((area) => {
@@ -211,10 +210,9 @@ const game = {
     if (simulatedGame.currentStatus.active === simulatedGame.playerActive) {
       return -10;
     }
-    const possibleMoves = [];
-    simulatedGame.allAreas.forEach((areaString) => {
+    const possibleMoves = simulatedGame.allAreas.filter((areaString) => {
       if (!simulatedGame[areaString]) {
-        possibleMoves.push(areaString);
+        return areaString;
       }
     });
     if (possibleMoves.length === 0) return 0;
