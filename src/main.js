@@ -1,4 +1,4 @@
-"strict mode";
+"use strict";
 
 // Game object from game.js
 import game from "./game.js";

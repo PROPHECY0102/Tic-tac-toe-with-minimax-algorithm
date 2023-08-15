@@ -1,4 +1,4 @@
-"strict mode";
+"use strict";
 
 import xIcon from "./assets/images/x.png";
 import oIcon from "./assets/images/o.png";
