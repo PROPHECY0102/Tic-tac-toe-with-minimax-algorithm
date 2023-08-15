@@ -146,7 +146,7 @@ body {
   gap: var(--size-800);
 }
 
-.logo-icon {
+.icon-link svg {
   width: var(--size-600);
   aspect-ratio: 1/1;
 }

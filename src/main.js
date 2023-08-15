@@ -4,16 +4,8 @@
 import game from "./game.js";
 import { hasChildWithClass, hasChildWithID } from "./game.js";
 
-import githubIcon from "./assets/images/github.png";
-import twitterIcon from "./assets/images/twitter.png";
 import xIcon from "./assets/images/x.png";
 import oIcon from "./assets/images/o.png";
-
-const githubLink = document.querySelector(".github-icon");
-const twitterLink = document.querySelector(".twitter-icon");
-
-githubLink.setAttribute("src", githubIcon);
-twitterLink.setAttribute("src", twitterIcon);
 
 // Closing modal overlay functionality
 const closeIcons = document.querySelectorAll(".close");
