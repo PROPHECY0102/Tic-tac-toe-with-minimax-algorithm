@@ -528,5 +528,3 @@ function init() {
 }
 
 init();
-
-("change");
