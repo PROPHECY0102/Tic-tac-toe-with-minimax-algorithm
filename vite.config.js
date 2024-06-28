@@ -1,4 +1,4 @@
 export default {
   root: "src",
-  base: "/Tic-tac-toe-with-minimax-algorithm/",
+  // base: "/Tic-tac-toe-with-minimax-algorithm/",
 };
